@@ -82,17 +82,23 @@ public:
     void changeCorporation(int Corporation) { // изменяет корпорацию игрока
         corporation = Corporation;
     }
+    void addGold(int amount) { // добавляет/уменьшает количество золота игрока
+        gold = gold + amount;
+    }
+    void addCobalt(int amount) { // добавляет/уменьшает количество кобальта игрока
+        cobalt = cobalt + amount;
+    }
     int getID() { // возвращает ID игрока
         return ID;
     }
     std::string getName() { // возвращает имя игрока
         return name;
     }
-    void addGold(int amount) { // добавляет/уменьшает количество золота игрока
-        gold = gold + amount;
+    int getNumberOfOwn() {
+        return numberOfOwn;
     }
-    void addCobalt(int amount) { // добавляет/уменьшает количество кобальта игрока
-        cobalt = cobalt + amount;
+    int* getOwn() {
+        return own;
     }
 };
 class System { // система
@@ -102,7 +108,7 @@ class System { // система
     bool doubleRing; // является ли двойным кольцом
     bool war; // находится ли в состоянии войны
     std::string name; // название системы
-    int player = 0; // номер игрока, которому принадлежит система (1 ... 4; 0 - никому)
+    int player = 0; // номер игрока (в массиве + 1), которому принадлежит система (1 ... 4; 0 - никому)
 public:
     System() { // конструктор
         gold = false;
@@ -203,6 +209,9 @@ class rocket: public station { // ракетная станция
 };
 
 
+
+
+
 void IdAndName(int numberOfPlayers, Player player[]) { // выводит ID и имя игроков
     int i;
     for (i = 1; i <= numberOfPlayers; i++) {
@@ -210,8 +219,51 @@ void IdAndName(int numberOfPlayers, Player player[]) { // выводит ID и �
         std::cout << player[i-1].getName() << "\n";
     }
 }
+void showSystemOfPlayers(int numberOfPlayers, Player players[], System systemcards[48]) {
+    int i, j;
+    for (i = 1; i <= 48; i++) {
+        std::cout << i << ". " << systemcards[i-1].getSystemName() << ", ID of player: " << systemcards[i-1].getSystemPlayer() << "\n";
+    }
+    for (i = 0; i < numberOfPlayers; i++) {
+        std::cout << "Player:\nID: " << players[i].getID() << ", Name: " << players[i].getName();
+        printf(", Собственность:\n");
+        for (j = 1; j <= players[i].getNumberOfOwn(); j++) {
+            std::cout << j << ". " << players[i].getOwn()[j-1] << "\n";
+        }
+    }
+}
+void Own(int numberOfPlayers, Player players[], System systemcards[48]) {
+    int i, j, k;
+    bool find[numberOfPlayers];
+    for (i = 0; i < 48; i++) {
+        for (j = 0; j < numberOfPlayers; j++) {
+            find[j] = false;
+        }
+        std::cout << "\n\n" << i << ". номер игрока: " << (systemcards[i].getSystemPlayer() - 1) << "";
+        for (j = 0; j < numberOfPlayers; j++) {
+            std::cout << "\n игрок:" << j;
+            for (k = 0; k < players[j].getNumberOfOwn(); k++) {
+                if (players[j].getOwn()[k] == i) {
+                    find[j] = true;
+                    std::cout << ", номер в массиве игрока: " << k;
+                }
+            }
 
-System* addSystemsCards(int numberOfPlayers, Player* players) { // создаёт системы и присваивает им владельцев
+        }
+        std::cout << "\n" << find[0];
+        for (k = 1; k < numberOfPlayers; k++) {
+            std::cout << " " << find[k];
+        }
+    }
+}
+
+
+
+
+
+
+
+System* addSystemsCards(int numberOfPlayers, Player players[]) { // создаёт системы и присваивает им владельцев
     System* systemCards = new System[48];
     int number, i, player[numberOfPlayers];
     bool k;
@@ -467,7 +519,7 @@ System* addSystemsCards(int numberOfPlayers, Player* players) { // создаё�
             if (player[number - 1] < (48 / numberOfPlayers)) { // количество систем у игрока должно быть < (количество систем)/(количество игроков)
                 player[number - 1]++;
                 systemCards[i-1].changeSystemPlayer(number);
-
+                players[number - 1].addSystemToPlayerPlayer(i - 1);
                 k = false;
             }
         }
@@ -479,13 +531,14 @@ void begin(int numberOfPlayers, Player player[]) {
 }
 int main() {
     System* systemCards;
-    int numberOfPlayers = 0, i, j, research = 0; // количество игроков, счётчик
+    int numberOfPlayers = 0, i, j, research = 0; // количество игроков, счётчик, счётчик, ход исследования Двойного Кольца
     printf("Введите количество игроков (от 2 до 4)\n");
     scanf("%i", &numberOfPlayers); // считывает количество игроков
     while ((numberOfPlayers < 2) || (numberOfPlayers > 4)) { // если введено неправильное количество игроков
         printf("Вы ввели неправильное количество игроков. Введите правильное количество игроков (от 2 до 4)\n");
         scanf("%i", &numberOfPlayers);
     }
+    //Player* player = new Player[numberOfPlayers];
     Player player[numberOfPlayers];
     std::string name;
     srand(time(NULL));
@@ -509,10 +562,14 @@ int main() {
         }
     }
 
-    systemCards = addSystemsCards(numberOfPlayers, );
-    while (research < 10) {
+    systemCards = addSystemsCards(numberOfPlayers, player);
 
-    }
+    IdAndName(numberOfPlayers, player);
+    showSystemOfPlayers(numberOfPlayers, player, systemCards);
+    Own(numberOfPlayers, player, systemCards);
+  /*  while (research < 10) {
+
+    } */
 
 
     return 0;
