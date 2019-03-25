@@ -119,9 +119,6 @@ public:
         player = 0;
         name = "";
     }
-    void links(int system) {
-
-    }
     void changeSystemGold(bool Gold) { // меняет информацию о золоте
         gold = Gold;
     }
@@ -212,49 +209,55 @@ class rocket: public station { // ракетная станция
 
 
 
-void IdAndName(int numberOfPlayers, Player player[]) { // выводит ID и имя игроков
+void IdAndName(int numberOfPlayers, Player player[]) { // выводит номер, когда игрок ходит, и имя игроков
     int i;
+    std::cout << "\n\n";
     for (i = 1; i <= numberOfPlayers; i++) {
-        std::cout << player[i-1].getID() << " ";
+        std::cout << player[i-1].getID()  << " ";
         std::cout << player[i-1].getName() << "\n";
     }
+    std::cout << "\n\n";
 }
-void showSystemOfPlayers(int numberOfPlayers, Player players[], System systemcards[48]) {
+void showSystemOfPlayers(int numberOfPlayers, Player players[], System systemcards[48]) { // выводит: номер системы, её название, номер в массиве игрока, которому принадлежит; про игроков: их номер в массиве, имя, номер, когда игрок ходит, системы, принадлежащие игроку
     int i, j;
-    for (i = 1; i <= 48; i++) {
-        std::cout << i << ". " << systemcards[i-1].getSystemName() << ", ID of player: " << systemcards[i-1].getSystemPlayer() << "\n";
+    std::cout << "\n\n";
+    for (i = 1; i <= 48; i++) { // выводит информацию о системе
+        std::cout << i << ". " << systemcards[i-1].getSystemName() << ", ID of player: " << (systemcards[i-1].getSystemPlayer() - 1) << "\n";
     }
-    for (i = 0; i < numberOfPlayers; i++) {
-        std::cout << "Player:\nID: " << players[i].getID() << ", Name: " << players[i].getName();
-        printf(", Собственность:\n");
+    for (i = 0; i < numberOfPlayers; i++) { // выводит информацию о игроке
+        std::cout << "Player:\nID: " << i << ", Name: " << players[i].getName() << ", каким ходит:" << players[i].getID();
+        printf(", Системы принадлежащие игроку:\n");
         for (j = 1; j <= players[i].getNumberOfOwn(); j++) {
             std::cout << j << ". " << players[i].getOwn()[j-1] << "\n";
         }
     }
+    std::cout << "\n\n";
 }
-void Own(int numberOfPlayers, Player players[], System systemcards[48]) {
+void Own(int numberOfPlayers, Player players[], System systemcards[48]) { // для каждой системы выводит информацию о том, кому система принадлежит(номер игрока в массиве), ищет её у каждого игрока
     int i, j, k;
     bool find[numberOfPlayers];
+    std::cout << "\n\n";
     for (i = 0; i < 48; i++) {
         for (j = 0; j < numberOfPlayers; j++) {
             find[j] = false;
         }
         std::cout << "\n\n" << i << ". номер игрока: " << (systemcards[i].getSystemPlayer() - 1) << "";
         for (j = 0; j < numberOfPlayers; j++) {
-            std::cout << "\n игрок:" << j;
+            std::cout << "\n игрок:" << j; // выписывает номер игрока в массиве
             for (k = 0; k < players[j].getNumberOfOwn(); k++) {
-                if (players[j].getOwn()[k] == i) {
+                if (players[j].getOwn()[k] == i) { // собственный номер системы в массиве у игрока совпал с номером системы
                     find[j] = true;
-                    std::cout << ", номер в массиве игрока: " << k;
+                    std::cout << ", номер в массиве игрока: " << k; // выписывает номер системы в массиве игрока
                 }
             }
 
         }
         std::cout << "\n" << find[0];
         for (k = 1; k < numberOfPlayers; k++) {
-            std::cout << " " << find[k];
+            std::cout << " " << find[k]; // выписывает у каких игроков была найдена система
         }
     }
+    std::cout << "\n\n";
 }
 
 
@@ -526,8 +529,11 @@ System* addSystemsCards(int numberOfPlayers, Player players[]) { // создаё
     }
     return systemCards;
 }
-void begin(int numberOfPlayers, Player player[]) {
-
+void win(System systemCards[48], Player players[]) {
+    std::cout << players[systemCards[0].getSystemPlayer() - 1].getName() << "победил!!!!!!!" ;
+}
+void begin(int numberOfPlayers, Player player[], System systemCards[48]) {
+    
 }
 int main() {
     System* systemCards;
@@ -564,13 +570,14 @@ int main() {
 
     systemCards = addSystemsCards(numberOfPlayers, player);
 
-    IdAndName(numberOfPlayers, player);
+   /* IdAndName(numberOfPlayers, player);
     showSystemOfPlayers(numberOfPlayers, player, systemCards);
-    Own(numberOfPlayers, player, systemCards);
-  /*  while (research < 10) {
+    Own(numberOfPlayers, player, systemCards); */
+    begin(numberOfPlayers, player, systemCards);
+    while (research < 10) {
 
-    } */
-
+    }
+    win(systemCards, player);
 
     return 0;
 }
