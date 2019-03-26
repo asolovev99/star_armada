@@ -6,19 +6,13 @@ class Player { // игрок
     int gold; // количество золота у игрока
     int cobalt; // количество кобальта у игрока
     int corporation; // номер корпорации игрока
-    int ID; // ID игрока
+    int *friendlyCorporations; // номера союзных корпораций
+    int ID; // показывает каким, по счёту, игрок ходит(от 1 до 4)
     int *own; // номера систем, которыми владеет игрок
     int numberOfOwn; // количество систем, которыми владеет игрок
     std::string name; // имя игрока
 
 public:
-   /* Player(int id, std::string Name) { // конструктор
-        gold = 0;
-        cobalt = 0;
-        corporation = 0;
-        ID = id;
-        name = Name;
-    } */
     Player() { // конструктор
         gold = 0;
         cobalt = 0;
@@ -27,6 +21,7 @@ public:
         name = "";
         numberOfOwn = 0;
         own = new int[0];
+        friendlyCorporations = new int[0];
     }
 
     void addSystemToPlayerPlayer(int id) { // добавляет в массив с системами, принадлежащими игроку, новую систему
@@ -73,13 +68,13 @@ public:
 
         return find;
     }
-    void changeName(std::string Name) { // изменяет имя игрока
+    void changePlayerName(std::string Name) { // изменяет имя игрока
         name = Name;
     }
-    void changeID(int id) { // изменяет ID игрока
+    void changePlayerID(int id) { // изменяет ID игрока
         ID = id;
     }
-    void changeCorporation(int Corporation) { // изменяет корпорацию игрока
+    void changePlayerCorporation(int Corporation) { // изменяет корпорацию игрока
         corporation = Corporation;
     }
     void addGold(int amount) { // добавляет/уменьшает количество золота игрока
@@ -88,19 +83,20 @@ public:
     void addCobalt(int amount) { // добавляет/уменьшает количество кобальта игрока
         cobalt = cobalt + amount;
     }
-    int getID() { // возвращает ID игрока
+    int getPlayerID() { // возвращает ID игрока
         return ID;
     }
-    std::string getName() { // возвращает имя игрока
+    std::string getPlayerName() { // возвращает имя игрока
         return name;
     }
-    int getNumberOfOwn() {
+    int getNumberOfOwn() { // возвращает количество систем, принадлежащих игроку
         return numberOfOwn;
     }
-    int* getOwn() {
+    int* getOwn() { // возвращает массив с номерами систем, принадлежащих игроку, в массиве систем
         return own;
     }
 };
+
 class System { // система
     bool gold; // добатывается ли в системе золото
     bool cobalt; // добывается ли в системе кобальт
@@ -108,7 +104,7 @@ class System { // система
     bool doubleRing; // является ли двойным кольцом
     bool war; // находится ли в состоянии войны
     std::string name; // название системы
-    int player = 0; // номер игрока (в массиве + 1), которому принадлежит система (1 ... 4; 0 - никому)
+    int player = 0; // номер игрока (в массиве игроков + 1), которому принадлежит система (1 ... 4; 0 - никому)
 public:
     System() { // конструктор
         gold = false;
@@ -213,8 +209,8 @@ void IdAndName(int numberOfPlayers, Player player[]) { // выводит ном�
     int i;
     std::cout << "\n\n";
     for (i = 1; i <= numberOfPlayers; i++) {
-        std::cout << player[i-1].getID()  << " ";
-        std::cout << player[i-1].getName() << "\n";
+        std::cout << player[i-1].getPlayerID()  << " ";
+        std::cout << player[i-1].getPlayerName() << "\n";
     }
     std::cout << "\n\n";
 }
@@ -225,7 +221,7 @@ void showSystemOfPlayers(int numberOfPlayers, Player players[], System systemcar
         std::cout << i << ". " << systemcards[i-1].getSystemName() << ", ID of player: " << (systemcards[i-1].getSystemPlayer() - 1) << "\n";
     }
     for (i = 0; i < numberOfPlayers; i++) { // выводит информацию о игроке
-        std::cout << "Player:\nID: " << i << ", Name: " << players[i].getName() << ", каким ходит:" << players[i].getID();
+        std::cout << "Player:\nID: " << i << ", Name: " << players[i].getPlayerName() << ", каким ходит:" << players[i].getPlayerID();
         printf(", Системы принадлежащие игроку:\n");
         for (j = 1; j <= players[i].getNumberOfOwn(); j++) {
             std::cout << j << ". " << players[i].getOwn()[j-1] << "\n";
@@ -265,7 +261,14 @@ void Own(int numberOfPlayers, Player players[], System systemcards[48]) { // д�
 
 
 
+std::string showCorporations() { // показывает союзные корпорации
 
+}
+void systemFromPlayerToPlayer(int SystemId, int PlayerArrayIDFrom, int PlayerArrayIdTo, int numberOfPlayers, Player player[], System systemCards[48]) { // передаёт систему от одного игрока другому
+    systemCards[SystemId].changeSystemPlayer(PlayerArrayIdTo + 1);
+    player[PlayerArrayIDFrom].deleteSystemFromPlayerPlayer(SystemId);
+    player[PlayerArrayIdTo].addSystemToPlayerPlayer(SystemId);
+}
 System* addSystemsCards(int numberOfPlayers, Player players[]) { // создаёт системы и присваивает им владельцев
     System* systemCards = new System[48];
     int number, i, player[numberOfPlayers];
@@ -530,14 +533,43 @@ System* addSystemsCards(int numberOfPlayers, Player players[]) { // создаё
     return systemCards;
 }
 void win(System systemCards[48], Player players[]) {
-    std::cout << players[systemCards[0].getSystemPlayer() - 1].getName() << "победил!!!!!!!" ;
+    std::cout << players[systemCards[0].getSystemPlayer() - 1].getPlayerName() << "победил!!!!!!!" ;
 }
 void begin(int numberOfPlayers, Player player[], System systemCards[48]) {
-    
+
 }
+
+
+
+
+
+void politic(int currentPlayer, int numberOfPlayers, Player player[], System systemCards[48]) { // этап "Политика"
+
+}
+void market(int currentPlayer, int numberOfPlayers, Player player[], System systemCards[48]) { // этап "Торговля"
+
+}
+void movement(int currentPlayer, int numberOfPlayers, Player player[], System systemCards[48]) { // этап "Навигация"
+
+}
+void manufacturing(int currentPlayer, int numberOfPlayers, Player player[], System systemCards[48]) { // этап "Производство"
+
+}
+void profit(int currentPlayer, int numberOfPlayers, Player player[], System systemCards[48]) { // этап "Доходы"
+
+}
+void war(int currentPlayer, int numberOfPlayers, Player player[], System systemCards[48]) { // этап "Война"(возможно, + "Конец хода")
+
+}
+void end(int currentPlayer, int numberOfPlayers, Player player[], System systemCards[48]) { // этап "Конец хода" (возможно, уберу)
+
+}
+
+
+
 int main() {
     System* systemCards;
-    int numberOfPlayers = 0, i, j, research = 0; // количество игроков, счётчик, счётчик, ход исследования Двойного Кольца
+    int numberOfPlayers = 0, i, j, research = 0, currentPlayer = 1; // количество игроков, счётчик, счётчик, ход исследования Двойного Кольца
     printf("Введите количество игроков (от 2 до 4)\n");
     scanf("%i", &numberOfPlayers); // считывает количество игроков
     while ((numberOfPlayers < 2) || (numberOfPlayers > 4)) { // если введено неправильное количество игроков
@@ -552,16 +584,16 @@ int main() {
         printf("Введите имя %i-го игрока\n", i);
         std::cin >> name; // считывает имя
         if (i == 1) {
-            player[0].changeName(name); // присваивает имя
-            player[0].changeID(rand() % numberOfPlayers + 1); // считает каким, по номеру(ID), будет ходить 1-ый игрок
+            player[0].changePlayerName(name); // присваивает имя
+            player[0].changePlayerID(rand() % numberOfPlayers + 1); // считает каким, по номеру(ID), будет ходить 1-ый игрок
         }
         else {
-            player[i-1].changeName(name); // присваивает имя
-            while (player[i-1].getID() == 0) {
-                player[i-1].changeID(rand() % numberOfPlayers + 1); // считает каким, по номеру(ID), будет ходить i-ый игрок
+            player[i-1].changePlayerName(name); // присваивает имя
+            while (player[i-1].getPlayerID() == 0) {
+                player[i-1].changePlayerID(rand() % numberOfPlayers + 1); // считает каким, по номеру(ID), будет ходить i-ый игрок
                 for (j = i - 1; j >= 1; j--) { // проверяет не совпали ли номера(ID)
-                    if (player[i-1].getID() == player[j-1].getID()) { // номера(ID) совпали => меняем ID(номера) на 0, чтобы повторить цикл
-                        player[i-1].changeID(0);
+                    if (player[i-1].getPlayerID() == player[j-1].getPlayerID()) { // номера(ID) совпали => меняем ID(номера) на 0, чтобы повторить цикл
+                        player[i-1].changePlayerID(0);
                     }
                 }
             }
@@ -570,12 +602,24 @@ int main() {
 
     systemCards = addSystemsCards(numberOfPlayers, player);
 
-   /* IdAndName(numberOfPlayers, player);
+    IdAndName(numberOfPlayers, player);
     showSystemOfPlayers(numberOfPlayers, player, systemCards);
-    Own(numberOfPlayers, player, systemCards); */
+    Own(numberOfPlayers, player, systemCards);
     begin(numberOfPlayers, player, systemCards);
     while (research < 10) {
-
+        politic(currentPlayer, numberOfPlayers, player, systemCards);
+        market(currentPlayer, numberOfPlayers, player, systemCards);
+        movement(currentPlayer, numberOfPlayers, player, systemCards);
+        manufacturing(currentPlayer, numberOfPlayers, player, systemCards);
+        profit(currentPlayer, numberOfPlayers, player, systemCards);
+        war(currentPlayer, numberOfPlayers, player, systemCards);
+        end(currentPlayer, numberOfPlayers, player, systemCards);
+        if (currentPlayer == 4) {
+            currentPlayer = 1;
+        }
+        else {
+            currentPlayer++;
+        }
     }
     win(systemCards, player);
 
